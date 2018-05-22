@@ -1,3 +1,5 @@
+#-*-coding:utf-8-*-
+
 ###########################################
 # Suppress matplotlib user warnings
 # Necessary for newer version of matplotlib
