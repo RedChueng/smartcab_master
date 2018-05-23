@@ -42,6 +42,10 @@ class LearningAgent(Agent):
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
 
+        if testing == True:
+            self.epsilon = 0
+            self.alpha = 0
+			
         return None
 
     def build_state(self):
@@ -57,8 +61,10 @@ class LearningAgent(Agent):
         ########### 
         ## TO DO ##
         ###########
-        # Set 'state' as a tuple of relevant data for the agent        
-        state = None
+        # Set 'state' as a tuple of relevant data for the agent    
+
+		# 状态由当前的交通情况、交通灯和车辆方向组成
+        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint,deadline)
 
         return state
 
@@ -136,6 +142,9 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
 
+        if self.learning == True:
+		    self.Q[state][action] = (1 - self.alpha) * self.Q[state][action] + self.alpha * reward
+			
         return
 
 
@@ -172,7 +181,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent)
+    agent = env.create_agent(LearningAgent,learning=True)
     
     ##############
     # Follow the driving agent
