@@ -45,6 +45,8 @@ class LearningAgent(Agent):
         if testing == True:
             self.epsilon = 0
             self.alpha = 0
+        else:
+            self.epsilon = self.epsilon - 0.05
 			
         return None
 
@@ -64,7 +66,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent    
 
 		# 状态由当前的交通情况、交通灯和车辆方向组成
-        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint,deadline)
+        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint)
 
         return state
 
