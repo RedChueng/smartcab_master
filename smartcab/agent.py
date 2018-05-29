@@ -10,7 +10,7 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
 
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
+    def __init__(self, env, learning=False, epsilon=0.99, alpha=0.6):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -68,7 +68,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent    
 
 		# 状态由当前的交通情况、交通灯和车辆方向组成
-        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint)
+        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint,deadline)
 
         return state
 
@@ -82,14 +82,16 @@ class LearningAgent(Agent):
         ###########
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = None
+        maxQ = max(self.Q[state].values())
 		
+        """
         max_Q_value = []
         for key,value in self.Q[state].items():
             if value == max(self.Q[state].values()):
                 max_Q_value.append(key)
 				
         maxQ = max(max_Q_value)
+        """
 		
         return maxQ 
 
@@ -104,10 +106,15 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
 
+        """
         if self.learning == True and state not in self.Q:
             self.Q[state] = {}
             for action in self.valid_actions:
                 self.Q[state][action] = 0.0
+        """
+		
+        if self.learning:
+            self.Q.setdefault(state,{action:0.0 for action in self.valid_actions})
         return
 
 
@@ -127,8 +134,12 @@ class LearningAgent(Agent):
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
 		
-        if self.learning == True and random.random() > self.epsilon:
-            action = self.get_maxQ(state)
+        if self.learning == True and random.random() > self.epsilon: # 以epsilon的概率随机选择一个action
+            action_list = []
+            for key, value in self.Q[state].items():
+                if value == self.get_maxQ(state):
+                    action_list.append(key)
+            action = random.choice(action_list) # 当maxQ对应多个action时，随机选择一个
         else:
     	    action = random.choice(self.valid_actions)
  
@@ -176,7 +187,7 @@ def run():
     #   verbose     - set to True to display additional output from the simulation
     #   num_dummies - discrete number of dummy agents in the environment, default is 100
     #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
-    env = Environment()
+    env = Environment(verbose=True)
 	
 	
     ##############
@@ -200,13 +211,13 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, display=False, log_metrics=True, update_delay=0.01, optimized=True)
+    sim = Simulator(env, display=True, log_metrics=True, update_delay=0.01, optimized=True)
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10, tolerance=0.005)
+    sim.run(n_test=10, tolerance=0.05)
 
 
 if __name__ == '__main__':
