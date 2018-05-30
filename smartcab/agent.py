@@ -10,7 +10,7 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
 
-    def __init__(self, env, learning=False, epsilon=0.99, alpha=0.6):
+    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -48,7 +48,6 @@ class LearningAgent(Agent):
         else:
             #self.epsilon = self.epsilon - 0.05
             self.epsilon = self.epsilon * 0.99
-            #self.epsilon = 
 			
         return None
 
@@ -68,7 +67,7 @@ class LearningAgent(Agent):
         # Set 'state' as a tuple of relevant data for the agent    
 
 		# 状态由当前的交通情况、交通灯和车辆方向组成
-        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint,deadline)
+        state = (inputs['light'],inputs['oncoming'],inputs['left'], inputs['right'],waypoint)
 
         return state
 
@@ -196,7 +195,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent,learning=True)
+    agent = env.create_agent(LearningAgent,learning=True,epsilon=1.0,alpha=0.5)
     
     ##############
     # Follow the driving agent
@@ -217,7 +216,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10, tolerance=0.05)
+    sim.run(n_test=10, tolerance=0.03)
 
 
 if __name__ == '__main__':
