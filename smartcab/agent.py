@@ -114,7 +114,7 @@ class LearningAgent(Agent):
 		
         if self.learning:
             self.Q.setdefault(state,{action:0.0 for action in self.valid_actions})
-        return
+        #return
 
 
     def choose_action(self, state):
@@ -132,13 +132,23 @@ class LearningAgent(Agent):
         # When not learning, choose a random action
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
-		
+        """
         if self.learning == True and random.random() > self.epsilon: # 以epsilon的概率随机选择一个action
             action_list = []
             for key, value in self.Q[state].items():
                 if value == self.get_maxQ(state):
                     action_list.append(key)
             action = random.choice(action_list) # 当maxQ对应多个action时，随机选择一个
+        else:
+    	    action = random.choice(self.valid_actions)
+        """
+
+        #代码优化
+		
+		if self.learning == True and random.random() > self.epsilon: # 以epsilon的概率随机选择一个action
+            maxQ = self.get_maxQ(state)
+            max_keys = [k for k,v in self.Q[state].items() if v == maxQ]
+			action = random.choice(max_keys)
         else:
     	    action = random.choice(self.valid_actions)
  
@@ -159,7 +169,7 @@ class LearningAgent(Agent):
         if self.learning == True:
 		    self.Q[state][action] = (1 - self.alpha) * self.Q[state][action] + self.alpha * reward
 			
-        return
+        #return
 
 
     def update(self):
@@ -173,7 +183,7 @@ class LearningAgent(Agent):
         reward = self.env.act(self, action) # Receive a reward
         self.learn(state, action, reward)   # Q-learn
 
-        return
+        #return
         
 
 def run():
